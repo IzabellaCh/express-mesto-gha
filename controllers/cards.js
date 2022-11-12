@@ -51,7 +51,7 @@ module.exports.likeCard = (req, res) => {
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(StatusCodes.NOT_FOUND).send({ message: 'Некорректный id карточки' });
+        res.status(StatusCodes.BAD_REQUEST).send({ message: 'Некорректный id карточки' });
       } else if (err.name === 'ReferenceError') {
         res.status(StatusCodes.NOT_FOUND).send({ message: err.message });
       } else {
@@ -72,7 +72,7 @@ module.exports.dislikeCard = (req, res) => {
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(StatusCodes.NOT_FOUND).send({ message: 'Некорректный id карточки' });
+        res.status(StatusCodes.BAD_REQUEST).send({ message: 'Некорректный id карточки' });
       } else if (err.name === 'ReferenceError') {
         res.status(StatusCodes.NOT_FOUND).send({ message: err.message });
       } else {
