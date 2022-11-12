@@ -10,7 +10,7 @@ module.exports.getUsers = (req, res) => {
 // по чек-листу ответа 400 не предусмотрено в данном запросе,
 // но при прохождении теста необходим ответ 400 в случае,
 // когда id не соответсвует стандарту (менее 24 символов)
-module.exports.getUserId = (req, res) => {
+module.exports.getUserById = (req, res) => {
   User.findById(req.params.userId)
     .orFail(() => {
       throw new ReferenceError('Пользователь не найден');
