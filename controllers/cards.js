@@ -1,9 +1,10 @@
+const { StatusCodes } = require('http-status-codes');
 const Card = require('../models/card');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.send({ data: cards }))
-    .catch(() => res.status(500).send({ message: 'Что-то пошло не так' }));
+    .catch(() => res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: 'Что-то пошло не так' }));
 };
 
 module.exports.createCard = (req, res) => {
@@ -13,9 +14,9 @@ module.exports.createCard = (req, res) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'При создании карточки введены некорректные данные' });
+        res.status(StatusCodes.BAD_REQUEST).send({ message: 'При создании карточки введены некорректные данные' });
       } else {
-        res.status(500).send({ message: 'Что-то пошло не так' });
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: 'Что-то пошло не так' });
       }
     });
 };
@@ -26,14 +27,14 @@ module.exports.deleteCard = (req, res) => {
     .orFail(() => {
       throw new ReferenceError('Такой карточки не существует');
     })
-    .then((deleteCard) => res.send({ data: deleteCard }))
+    .then(() => res.send({ message: 'Пост удален' }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Некорректный id карточки' });
+        res.status(StatusCodes.NOT_FOUND).send({ message: 'Некорректный id карточки' });
       } else if (err.name === 'ReferenceError') {
-        res.status(404).send({ message: err.message });
+        res.status(StatusCodes.NOT_FOUND).send({ message: err.message });
       } else {
-        res.status(500).send({ message: 'Что-то пошло не так' });
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: 'Что-то пошло не так' });
       }
     });
 };
@@ -50,11 +51,11 @@ module.exports.likeCard = (req, res) => {
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Некорректный id карточки' });
+        res.status(StatusCodes.NOT_FOUND).send({ message: 'Некорректный id карточки' });
       } else if (err.name === 'ReferenceError') {
-        res.status(404).send({ message: err.message });
+        res.status(StatusCodes.NOT_FOUND).send({ message: err.message });
       } else {
-        res.status(500).send({ message: 'Что-то пошло не так' });
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: 'Что-то пошло не так' });
       }
     });
 };
@@ -71,11 +72,11 @@ module.exports.dislikeCard = (req, res) => {
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Некорректный id карточки' });
+        res.status(StatusCodes.NOT_FOUND).send({ message: 'Некорректный id карточки' });
       } else if (err.name === 'ReferenceError') {
-        res.status(404).send({ message: err.message });
+        res.status(StatusCodes.NOT_FOUND).send({ message: err.message });
       } else {
-        res.status(500).send({ message: 'Что-то пошло не так' });
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: 'Что-то пошло не так' });
       }
     });
 };
