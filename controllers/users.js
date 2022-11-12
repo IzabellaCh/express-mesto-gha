@@ -15,7 +15,7 @@ module.exports.getUserId = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(StatusCodes.NOT_FOUND).send({ message: 'Некорректный id пользователя' });
+        res.status(StatusCodes.BAD_REQUEST).send({ message: 'Некорректный id пользователя' });
       } else if (err.name === 'ReferenceError') {
         res.status(StatusCodes.NOT_FOUND).send({ message: err.message });
       } else {
