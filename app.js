@@ -9,6 +9,7 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
 app.use((req, res, next) => {
@@ -23,5 +24,5 @@ app.use('/users', user);
 app.use('/cards', card);
 
 app.listen(PORT, () => {
-  console.log('Ссылка на сервер');
+  console.log('Сервер запущен');
 });
