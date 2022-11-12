@@ -3,7 +3,7 @@ const Card = require('../models/card');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
-    .then((cards) => res.send({ data: cards }))
+    .then((cards) => res.send(cards))
     .catch(() => res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: 'Что-то пошло не так' }));
 };
 
@@ -11,7 +11,7 @@ module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
   const owner = req.user._id;
   Card.create({ name, link, owner })
-    .then((card) => res.send({ data: card }))
+    .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(StatusCodes.BAD_REQUEST).send({ message: 'При создании карточки введены некорректные данные' });
