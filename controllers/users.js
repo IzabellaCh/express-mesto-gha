@@ -43,7 +43,7 @@ module.exports.createUser = (req, res) => {
 module.exports.updateProfile = (req, res) => {
   const { name, about } = req.body;
   const id = req.user._id;
-  User.findByIdAndUpdate(id, { name, about }, { runValidators: true })
+  User.findByIdAndUpdate(id, { name, about }, { runValidators: true, new: true })
     .orFail(() => {
       throw new ReferenceError('Пользователь не найден');
     })
@@ -62,7 +62,7 @@ module.exports.updateProfile = (req, res) => {
 module.exports.updateAvatar = (req, res) => {
   const { avatar } = req.body;
   const id = req.user._id;
-  User.findByIdAndUpdate(id, { avatar }, { runValidators: true })
+  User.findByIdAndUpdate(id, { avatar }, { runValidators: true, new: true })
     .orFail(() => {
       throw new ReferenceError('Пользователь не найден');
     })
