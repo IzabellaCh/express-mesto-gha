@@ -7,6 +7,9 @@ module.exports.getUsers = (req, res) => {
     .catch(() => res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка' }));
 };
 
+// по чек-листу ответа 400 не предусмотрено в данном запросе,
+// но при прохождении теста необходим ответ 400 в случае,
+// когда id не соответсвует стандарту (менее 24 символов)
 module.exports.getUserId = (req, res) => {
   User.findById(req.params.userId)
     .orFail(() => {
