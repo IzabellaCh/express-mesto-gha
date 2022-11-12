@@ -21,9 +21,6 @@ module.exports.createCard = (req, res) => {
     });
 };
 
-// по чек-листу ответа 400 не предусмотрено в данном запросе,
-// но при прохождении теста необходим ответ 400 в случае,
-// когда id не соответсвует стандарту (менее 24 символов)
 module.exports.deleteCard = (req, res) => {
   const { cardId } = req.params;
   Card.findByIdAndRemove(cardId)
@@ -42,9 +39,6 @@ module.exports.deleteCard = (req, res) => {
     });
 };
 
-// по чек-листу ответа 400 не предусмотрено в данном запросе,
-// но при прохождении теста необходим ответ 400 в случае,
-// когда id не соответсвует стандарту (менее 24 символов)
 module.exports.likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
@@ -66,9 +60,6 @@ module.exports.likeCard = (req, res) => {
     });
 };
 
-// по чек-листу ответа 400 не предусмотрено в данном запросе,
-// но при прохождении теста необходим ответ 400 в случае,
-// когда id не соответсвует стандарту (менее 24 символов)
 module.exports.dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
