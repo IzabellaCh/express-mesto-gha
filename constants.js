@@ -1,11 +1,13 @@
-const serverError = 'На сервере произошла ошибка';
-const incorrectUserId = 'Некорректный id пользователя';
-const incorrectData = 'Введены некорректные данные';
-const incorrectCardId = 'Некорректный id карточки';
+const SERVER_ERROR_MESSAGE = 'На сервере произошла ошибка';
+const INCORRECT_USER_ID_MESSAGE = 'Некорректный id пользователя';
+const INCORRECT_DATA_MESSAGE = 'Введены некорректные данные';
+const INCORRECT_CARD_ID_MESSAGE = 'Некорректный id карточки';
+const PAGE_NOT_FOUND_MESSAGE = 'Страница по указанному маршруту не найдена';
 
 module.exports = {
-  serverError,
-  incorrectUserId,
-  incorrectData,
-  incorrectCardId,
+  SERVER_ERROR_MESSAGE,
+  INCORRECT_USER_ID_MESSAGE,
+  INCORRECT_DATA_MESSAGE,
+  INCORRECT_CARD_ID_MESSAGE,
+  PAGE_NOT_FOUND_MESSAGE,
 };

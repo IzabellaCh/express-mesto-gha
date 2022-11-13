@@ -2,15 +2,17 @@ const { StatusCodes } = require('http-status-codes');
 const User = require('../models/user');
 const ResourceNotFoundError = require('../error');
 const {
-  serverError,
-  incorrectUserId,
-  incorrectData,
+  SERVER_ERROR_MESSAGE,
+  INCORRECT_USER_ID_MESSAGE,
+  INCORRECT_DATA_MESSAGE,
 } = require('../constants');
 
 const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.send(users))
-    .catch(() => res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: serverError }));
+    .catch(() => res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .send({ message: SERVER_ERROR_MESSAGE }));
 };
 
 const getUserById = (req, res) => {
@@ -21,11 +23,11 @@ const getUserById = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(StatusCodes.BAD_REQUEST).send({ message: incorrectUserId });
+        res.status(StatusCodes.BAD_REQUEST).send({ message: INCORRECT_USER_ID_MESSAGE });
       } else if (err.name === 'ResourceNotFoundError') {
         res.status(StatusCodes.NOT_FOUND).send({ message: err.message });
       } else {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: serverError });
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: SERVER_ERROR_MESSAGE });
       }
     });
 };
@@ -36,9 +38,9 @@ const createUser = (req, res) => {
     .then((user) => res.status(StatusCodes.CREATED).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(StatusCodes.BAD_REQUEST).send({ message: incorrectData });
+        res.status(StatusCodes.BAD_REQUEST).send({ message: INCORRECT_DATA_MESSAGE });
       } else {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: serverError });
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: SERVER_ERROR_MESSAGE });
       }
     });
 };
@@ -55,11 +57,11 @@ const updateProfile = (req, res) => {
       if (err.name === 'ResourceNotFoundError') {
         res.status(StatusCodes.NOT_FOUND).send({ message: err.message });
       } else if (err.name === 'CastError') {
-        res.status(StatusCodes.BAD_REQUEST).send({ message: incorrectUserId });
+        res.status(StatusCodes.BAD_REQUEST).send({ message: INCORRECT_USER_ID_MESSAGE });
       } else if (err.name === 'ValidationError') {
-        res.status(StatusCodes.BAD_REQUEST).send({ message: incorrectData });
+        res.status(StatusCodes.BAD_REQUEST).send({ message: INCORRECT_DATA_MESSAGE });
       } else {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: serverError });
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: SERVER_ERROR_MESSAGE });
       }
     });
 };
@@ -76,11 +78,11 @@ const updateAvatar = (req, res) => {
       if (err.name === 'ResourceNotFoundError') {
         res.status(StatusCodes.NOT_FOUND).send({ message: err.message });
       } else if (err.name === 'CastError') {
-        res.status(StatusCodes.BAD_REQUEST).send({ message: incorrectUserId });
+        res.status(StatusCodes.BAD_REQUEST).send({ message: INCORRECT_USER_ID_MESSAGE });
       } else if (err.name === 'ValidationError') {
-        res.status(StatusCodes.BAD_REQUEST).send({ message: incorrectData });
+        res.status(StatusCodes.BAD_REQUEST).send({ message: INCORRECT_DATA_MESSAGE });
       } else {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: serverError });
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: SERVER_ERROR_MESSAGE });
       }
     });
 };
