@@ -4,14 +4,15 @@ const ResourceNotFoundError = require('../error');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
+    .populate(['owner', 'likes'])
     .then((cards) => res.send(cards))
     .catch(() => res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: 'Что-то пошло не так' }));
 };
 
 module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
-  const owner = req.user._id;
-  Card.create({ name, link, owner })
+  const { _id } = req.user;
+  Card.create({ name, link, owner: _id })
     .then((card) => res.status(StatusCodes.CREATED).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -28,6 +29,7 @@ module.exports.deleteCard = (req, res) => {
     .orFail(() => {
       throw new ResourceNotFoundError();
     })
+    .populate(['owner', 'likes'])
     .then(() => res.send({ message: 'Пост удален' }))
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -49,6 +51,7 @@ module.exports.likeCard = (req, res) => {
     .orFail(() => {
       throw new ResourceNotFoundError();
     })
+    .populate(['owner', 'likes'])
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -70,6 +73,7 @@ module.exports.dislikeCard = (req, res) => {
     .orFail(() => {
       throw new ResourceNotFoundError();
     })
+    .populate(['owner', 'likes'])
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
