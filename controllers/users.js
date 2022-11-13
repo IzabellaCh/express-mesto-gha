@@ -2,13 +2,13 @@ const { StatusCodes } = require('http-status-codes');
 const User = require('../models/user');
 const ResourceNotFoundError = require('../error');
 
-module.exports.getUsers = (req, res) => {
+const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.send(users))
     .catch(() => res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка' }));
 };
 
-module.exports.getUserById = (req, res) => {
+const getUserById = (req, res) => {
   User.findById(req.params.userId)
     .orFail(() => {
       throw new ResourceNotFoundError();
@@ -25,7 +25,7 @@ module.exports.getUserById = (req, res) => {
     });
 };
 
-module.exports.createUser = (req, res) => {
+const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
     .then((user) => res.status(StatusCodes.CREATED).send(user))
@@ -38,7 +38,7 @@ module.exports.createUser = (req, res) => {
     });
 };
 
-module.exports.updateProfile = (req, res) => {
+const updateProfile = (req, res) => {
   const { name, about } = req.body;
   const id = req.user._id;
   User.findByIdAndUpdate(id, { name, about }, { runValidators: true, new: true })
@@ -59,7 +59,7 @@ module.exports.updateProfile = (req, res) => {
     });
 };
 
-module.exports.updateAvatar = (req, res) => {
+const updateAvatar = (req, res) => {
   const { avatar } = req.body;
   const id = req.user._id;
   User.findByIdAndUpdate(id, { avatar }, { runValidators: true, new: true })
@@ -82,4 +82,12 @@ module.exports.updateAvatar = (req, res) => {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
       }
     });
+};
+
+module.exports = {
+  getUsers,
+  getUserById,
+  createUser,
+  updateProfile,
+  updateAvatar,
 };
