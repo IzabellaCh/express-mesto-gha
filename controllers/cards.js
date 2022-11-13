@@ -36,7 +36,6 @@ const deleteCard = (req, res) => {
     .orFail(() => {
       throw new ResourceNotFoundError();
     })
-    .populate(['owner', 'likes'])
     .then(() => res.send({ message: 'Пост удален' }))
     .catch((err) => {
       if (err.name === 'CastError') {
