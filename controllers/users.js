@@ -1,11 +1,16 @@
 const { StatusCodes } = require('http-status-codes');
 const User = require('../models/user');
 const ResourceNotFoundError = require('../error');
+const {
+  serverError,
+  incorrectUserId,
+  incorrectData,
+} = require('../constants');
 
 const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.send(users))
-    .catch(() => res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка' }));
+    .catch(() => res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: serverError }));
 };
 
 const getUserById = (req, res) => {
@@ -16,11 +21,11 @@ const getUserById = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(StatusCodes.BAD_REQUEST).send({ message: 'Некорректный id пользователя' });
+        res.status(StatusCodes.BAD_REQUEST).send({ message: incorrectUserId });
       } else if (err.name === 'ResourceNotFoundError') {
         res.status(StatusCodes.NOT_FOUND).send({ message: err.message });
       } else {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: serverError });
       }
     });
 };
@@ -31,9 +36,9 @@ const createUser = (req, res) => {
     .then((user) => res.status(StatusCodes.CREATED).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(StatusCodes.BAD_REQUEST).send({ message: 'При создании пользователя введены некорректные данные' });
+        res.status(StatusCodes.BAD_REQUEST).send({ message: incorrectData });
       } else {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: serverError });
       }
     });
 };
@@ -50,11 +55,11 @@ const updateProfile = (req, res) => {
       if (err.name === 'ResourceNotFoundError') {
         res.status(StatusCodes.NOT_FOUND).send({ message: err.message });
       } else if (err.name === 'CastError') {
-        res.status(StatusCodes.BAD_REQUEST).send({ message: 'Некорректный id пользователя' });
+        res.status(StatusCodes.BAD_REQUEST).send({ message: incorrectUserId });
       } else if (err.name === 'ValidationError') {
-        res.status(StatusCodes.BAD_REQUEST).send({ message: 'Введены некорректные данные' });
+        res.status(StatusCodes.BAD_REQUEST).send({ message: incorrectData });
       } else {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: serverError });
       }
     });
 };
@@ -64,22 +69,18 @@ const updateAvatar = (req, res) => {
   const id = req.user._id;
   User.findByIdAndUpdate(id, { avatar }, { runValidators: true, new: true })
     .orFail(() => {
-      if (id.length === 24) {
-        throw new ResourceNotFoundError();
-      } else {
-        throw new RangeError('Некорректный id пользователя');
-      }
+      throw new ResourceNotFoundError();
     })
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ResourceNotFoundError') {
         res.status(StatusCodes.NOT_FOUND).send({ message: err.message });
       } else if (err.name === 'CastError') {
-        res.status(StatusCodes.BAD_REQUEST).send({ message: 'Некорректный id пользователя' });
+        res.status(StatusCodes.BAD_REQUEST).send({ message: incorrectUserId });
       } else if (err.name === 'ValidationError') {
-        res.status(StatusCodes.BAD_REQUEST).send({ message: 'Введены некорректные данные' });
+        res.status(StatusCodes.BAD_REQUEST).send({ message: incorrectData });
       } else {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: serverError });
       }
     });
 };
