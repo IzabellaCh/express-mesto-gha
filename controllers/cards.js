@@ -1,5 +1,6 @@
 const { StatusCodes } = require('http-status-codes');
 const Card = require('../models/card');
+const ResourceNotFoundError = require('../error');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
@@ -25,13 +26,13 @@ module.exports.deleteCard = (req, res) => {
   const { cardId } = req.params;
   Card.findByIdAndRemove(cardId)
     .orFail(() => {
-      throw new ReferenceError('Такой карточки не существует');
+      throw new ResourceNotFoundError();
     })
     .then(() => res.send({ message: 'Пост удален' }))
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(StatusCodes.BAD_REQUEST).send({ message: 'Некорректный id карточки' });
-      } else if (err.name === 'ReferenceError') {
+      } else if (err.name === 'ResourceNotFoundError') {
         res.status(StatusCodes.NOT_FOUND).send({ message: err.message });
       } else {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: 'Что-то пошло не так' });
@@ -46,13 +47,13 @@ module.exports.likeCard = (req, res) => {
     { new: true },
   )
     .orFail(() => {
-      throw new ReferenceError('Такой карточки не существует');
+      throw new ResourceNotFoundError();
     })
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(StatusCodes.BAD_REQUEST).send({ message: 'Некорректный id карточки' });
-      } else if (err.name === 'ReferenceError') {
+      } else if (err.name === 'ResourceNotFoundError') {
         res.status(StatusCodes.NOT_FOUND).send({ message: err.message });
       } else {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: 'Что-то пошло не так' });
@@ -67,13 +68,13 @@ module.exports.dislikeCard = (req, res) => {
     { new: true },
   )
     .orFail(() => {
-      throw new ReferenceError('Такой карточки не существует');
+      throw new ResourceNotFoundError();
     })
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(StatusCodes.BAD_REQUEST).send({ message: 'Некорректный id карточки' });
-      } else if (err.name === 'ReferenceError') {
+      } else if (err.name === 'ResourceNotFoundError') {
         res.status(StatusCodes.NOT_FOUND).send({ message: err.message });
       } else {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: 'Что-то пошло не так' });

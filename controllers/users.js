@@ -1,5 +1,6 @@
 const { StatusCodes } = require('http-status-codes');
 const User = require('../models/user');
+const ResourceNotFoundError = require('../error');
 
 module.exports.getUsers = (req, res) => {
   User.find({})
@@ -10,13 +11,13 @@ module.exports.getUsers = (req, res) => {
 module.exports.getUserById = (req, res) => {
   User.findById(req.params.userId)
     .orFail(() => {
-      throw new ReferenceError('Пользователь не найден');
+      throw new ResourceNotFoundError();
     })
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(StatusCodes.BAD_REQUEST).send({ message: 'Некорректный id пользователя' });
-      } else if (err.name === 'ReferenceError') {
+      } else if (err.name === 'ResourceNotFoundError') {
         res.status(StatusCodes.NOT_FOUND).send({ message: err.message });
       } else {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
@@ -42,12 +43,14 @@ module.exports.updateProfile = (req, res) => {
   const id = req.user._id;
   User.findByIdAndUpdate(id, { name, about }, { runValidators: true, new: true })
     .orFail(() => {
-      throw new ReferenceError('Пользователь не найден');
+      throw new ResourceNotFoundError();
     })
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'ReferenceError') {
+      if (err.name === 'ResourceNotFoundError') {
         res.status(StatusCodes.NOT_FOUND).send({ message: err.message });
+      } else if (err.name === 'CastError') {
+        res.status(StatusCodes.BAD_REQUEST).send({ message: 'Некорректный id пользователя' });
       } else if (err.name === 'ValidationError') {
         res.status(StatusCodes.BAD_REQUEST).send({ message: 'Введены некорректные данные' });
       } else {
@@ -61,12 +64,18 @@ module.exports.updateAvatar = (req, res) => {
   const id = req.user._id;
   User.findByIdAndUpdate(id, { avatar }, { runValidators: true, new: true })
     .orFail(() => {
-      throw new ReferenceError('Пользователь не найден');
+      if (id.length === 24) {
+        throw new ResourceNotFoundError();
+      } else {
+        throw new RangeError('Некорректный id пользователя');
+      }
     })
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'ReferenceError') {
+      if (err.name === 'ResourceNotFoundError') {
         res.status(StatusCodes.NOT_FOUND).send({ message: err.message });
+      } else if (err.name === 'CastError') {
+        res.status(StatusCodes.BAD_REQUEST).send({ message: 'Некорректный id пользователя' });
       } else if (err.name === 'ValidationError') {
         res.status(StatusCodes.BAD_REQUEST).send({ message: 'Введены некорректные данные' });
       } else {
