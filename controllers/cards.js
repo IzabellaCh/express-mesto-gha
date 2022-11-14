@@ -78,50 +78,6 @@ const removeLike = (req, res) => {
   updateLikeCard(req, res, { $pull: { likes: req.user._id } });
 };
 
-// const likeCard = (req, res) => {
-//   Card.findByIdAndUpdate(
-//     req.params.cardId,
-//     { $addToSet: { likes: req.user._id } },
-//     { new: true },
-//   )
-//     .orFail(() => {
-//       throw new ResourceNotFoundError();
-//     })
-//     .populate(['owner', 'likes'])
-//     .then((card) => res.send(card))
-//     .catch((err) => {
-//       if (err.name === 'CastError') {
-//         res.status(StatusCodes.BAD_REQUEST).send({ message: INCORRECT_CARD_ID_MESSAGE });
-//       } else if (err.name === 'ResourceNotFoundError') {
-//         res.status(StatusCodes.NOT_FOUND).send({ message: err.message });
-//       } else {
-//         res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: SERVER_ERROR_MESSAGE });
-//       }
-//     });
-// };
-
-// const dislikeCard = (req, res) => {
-//   Card.findByIdAndUpdate(
-//     req.params.cardId,
-//     { $pull: { likes: req.user._id } },
-//     { new: true },
-//   )
-//     .orFail(() => {
-//       throw new ResourceNotFoundError();
-//     })
-//     .populate(['owner', 'likes'])
-//     .then((card) => res.send(card))
-//     .catch((err) => {
-//       if (err.name === 'CastError') {
-//         res.status(StatusCodes.BAD_REQUEST).send({ message: INCORRECT_CARD_ID_MESSAGE });
-//       } else if (err.name === 'ResourceNotFoundError') {
-//         res.status(StatusCodes.NOT_FOUND).send({ message: err.message });
-//       } else {
-//         res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: SERVER_ERROR_MESSAGE });
-//       }
-//     });
-// };
-
 module.exports = {
   getCards,
   createCard,
