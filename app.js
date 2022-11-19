@@ -12,14 +12,6 @@ app.use(cookieParser());
 
 mongoose.connect(mongoDB);
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '636cab7359d319f9a8a6e6a0',
-  };
-
-  next();
-});
-
 app.use('/', router);
 
 app.listen(PORT, () => {
