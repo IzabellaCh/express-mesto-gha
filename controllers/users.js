@@ -108,16 +108,15 @@ const login = (req, res) => {
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
       res
-        .cookie('token', token, {
+        .cookie('jwt', token, {
           maxAge: 3600000 * 24 * 7,
           httpOnly: true,
         })
         .send({ message: 'Вы успешно авторизовались' });
-      // res.send(token);
     })
     .catch((err) => {
       if (err.name === 'ResourceNotFoundError') {
-        res.status(StatusCodes.UNAUTHORIZED).send({ message: err.message });
+        res.status(StatusCodes.UNAUTHORIZED).send({ message: 'Неправильные почта или пароль' });
       } else {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: SERVER_ERROR_MESSAGE });
       }
