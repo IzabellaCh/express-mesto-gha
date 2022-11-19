@@ -17,8 +17,9 @@ const getUsers = (req, res) => {
       .send({ message: SERVER_ERROR_MESSAGE }));
 };
 
-const getUserById = (req, res) => {
-  User.findById(req.params.userId)
+// общая фукнция, испльзуется в 2х контроллерах: getUserById, getMyProfile
+const findUserById = (req, res, id) => {
+  User.findById(id)
     .orFail(() => {
       throw new ResourceNotFoundError();
     })
@@ -32,6 +33,14 @@ const getUserById = (req, res) => {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: SERVER_ERROR_MESSAGE });
       }
     });
+};
+
+const getUserById = (req, res) => {
+  findUserById(req, res, req.params.userId);
+};
+
+const getMyProfile = (req, res) => {
+  findUserById(req, res, req.user._id);
 };
 
 const createUser = (req, res) => {
@@ -130,4 +139,5 @@ module.exports = {
   updateProfile,
   updateAvatar,
   login,
+  getMyProfile,
 };
