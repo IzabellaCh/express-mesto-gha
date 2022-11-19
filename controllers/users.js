@@ -1,4 +1,6 @@
 const { StatusCodes } = require('http-status-codes');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const ResourceNotFoundError = require('../error');
 const {
@@ -33,8 +35,21 @@ const getUserById = (req, res) => {
 };
 
 const createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
+  const {
+    name,
+    about,
+    avatar,
+    email,
+    password,
+  } = req.body;
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    }))
     .then((user) => res.status(StatusCodes.CREATED).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -87,10 +102,33 @@ const updateAvatar = (req, res) => {
     });
 };
 
+const login = (req, res) => {
+  const { email, password } = req.body;
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      res
+        .cookie('token', token, {
+          maxAge: 3600000 * 24 * 7,
+          httpOnly: true,
+        })
+        .send({ message: 'Вы успешно авторизовались' });
+      // res.send(token);
+    })
+    .catch((err) => {
+      if (err.name === 'ResourceNotFoundError') {
+        res.status(StatusCodes.UNAUTHORIZED).send({ message: err.message });
+      } else {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: SERVER_ERROR_MESSAGE });
+      }
+    });
+};
+
 module.exports = {
   getUsers,
   getUserById,
   createUser,
   updateProfile,
   updateAvatar,
+  login,
 };
