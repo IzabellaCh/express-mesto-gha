@@ -1,10 +1,10 @@
-class emailIsRegisteredError extends Error {
+class EmailIsRegisteredError extends Error {
   constructor() {
     super();
-    this.name = 'emailIsRegisteredError';
+    this.name = 'EmailIsRegisteredError';
     this.statusCode = 409;
     this.message = 'Пользователь с таким email уже зарегистрирован';
   }
 }
 
-module.exports = emailIsRegisteredError;
+module.exports = EmailIsRegisteredError;

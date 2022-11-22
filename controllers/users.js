@@ -60,7 +60,7 @@ const createUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new ValidationError());
-      } else if (err.name === 'MongoServerError') {
+      } else if (err.code === 11000) {
         next(new EmailIsRegisteredError());
       } else {
         next(err);
