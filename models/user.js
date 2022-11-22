@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
-const ResourceNotFoundError = require('../error');
+const ResourceNotFoundError = require('../errors/error');
 
 const userSchema = new mongoose.Schema({
   name: {

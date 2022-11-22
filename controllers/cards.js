@@ -1,6 +1,7 @@
 const { StatusCodes } = require('http-status-codes');
 const Card = require('../models/card');
-const ResourceNotFoundError = require('../error');
+const ResourceNotFoundError = require('../errors/error');
+const NotOwnerError = require('../errors/notOwnerError');
 const {
   SERVER_ERROR_MESSAGE,
   INCORRECT_DATA_MESSAGE,
@@ -32,16 +33,26 @@ const createCard = (req, res) => {
 
 const deleteCard = (req, res) => {
   const { cardId } = req.params;
-  Card.findByIdAndRemove(cardId)
+  Card.findById(cardId)
     .orFail(() => {
       throw new ResourceNotFoundError();
     })
-    .then(() => res.send({ message: 'Пост удален' }))
+    .then((card) => {
+      const owner = card.owner._id.toString();
+      const userId = req.user._id;
+      if (owner !== userId) {
+        throw new NotOwnerError();
+      }
+      Card.findByIdAndRemove(cardId)
+        .then(() => res.send({ message: 'Пост удален' }));
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(StatusCodes.BAD_REQUEST).send({ message: INCORRECT_CARD_ID_MESSAGE });
       } else if (err.name === 'ResourceNotFoundError') {
         res.status(StatusCodes.NOT_FOUND).send({ message: err.message });
+      } else if (err.name === 'NotOwnerError') {
+        res.status(err.statusCode).send({ message: err.message });
       } else {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: SERVER_ERROR_MESSAGE });
       }

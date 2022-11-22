@@ -2,7 +2,7 @@ const { StatusCodes } = require('http-status-codes');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const ResourceNotFoundError = require('../error');
+const ResourceNotFoundError = require('../errors/error');
 const {
   SERVER_ERROR_MESSAGE,
   INCORRECT_USER_ID_MESSAGE,
@@ -17,7 +17,7 @@ const getUsers = (req, res) => {
       .send({ message: SERVER_ERROR_MESSAGE }));
 };
 
-// общая фукнция, испльзуется в 2х контроллерах: getUserById, getMyProfile
+// общая функция, используется в 2х контроллерах: getUserById, getMyProfile
 const findUserById = (req, res, id) => {
   User.findById(id)
     .orFail(() => {
@@ -63,6 +63,8 @@ const createUser = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(StatusCodes.BAD_REQUEST).send({ message: INCORRECT_DATA_MESSAGE });
+      } else if (err.name === 'ResourceNotFoundError') {
+        res.status(StatusCodes.UNAUTHORIZED).send({ message: INCORRECT_DATA_MESSAGE });
       } else {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: SERVER_ERROR_MESSAGE });
       }
@@ -116,12 +118,14 @@ const login = (req, res) => {
   return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      // console.log(token);
       res
         .cookie('jwt', token, {
           maxAge: 3600000 * 24 * 7,
           httpOnly: true,
         })
-        .send({ message: 'Вы успешно авторизовались' });
+        .send({ message: 'Вы успешно авторизовались' })
+        .end();
     })
     .catch((err) => {
       if (err.name === 'ResourceNotFoundError') {
