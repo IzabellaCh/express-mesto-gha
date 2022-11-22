@@ -1,4 +1,5 @@
 const user = require('express').Router();
+const { celebrate, Joi } = require('celebrate');
 
 const {
   getUsers,
@@ -11,7 +12,16 @@ const {
 user.get('/', getUsers);
 user.get('/me', getMyProfile);
 user.get('/:userId', getUserById);
-user.patch('/me', updateProfile);
-user.patch('/me/avatar', updateAvatar);
+user.patch('/me', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+  }),
+}), updateProfile);
+user.patch('/me/avatar', celebrate({
+  body: Joi.object().keys({
+    avatar: Joi.string().pattern(/https?:\/\/\S+\.\S+/),
+  }),
+}), updateAvatar);
 
 module.exports = user;

@@ -1,6 +1,7 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
+const { errors } = require('celebrate');
 const router = require('./routes/index');
 
 const { PORT = 3000, mongoDB = 'mongodb://localhost:27017/mestodb' } = process.env;
@@ -14,6 +15,7 @@ mongoose.connect(mongoDB);
 
 app.use('/', router);
 
+app.use(errors());
 app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
 
