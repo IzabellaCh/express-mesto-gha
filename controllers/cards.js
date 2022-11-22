@@ -2,36 +2,31 @@ const { StatusCodes } = require('http-status-codes');
 const Card = require('../models/card');
 const ResourceNotFoundError = require('../errors/resourceNotFoundError');
 const NotOwnerError = require('../errors/notOwnerError');
-const {
-  SERVER_ERROR_MESSAGE,
-  INCORRECT_DATA_MESSAGE,
-  INCORRECT_CARD_ID_MESSAGE,
-} = require('../constants');
+const CastError = require('../errors/castError');
+const ValidationError = require('../errors/validationError');
 
-const getCards = (req, res) => {
+const getCards = (req, res, next) => {
   Card.find({})
     .populate(['owner', 'likes'])
     .then((cards) => res.send(cards))
-    .catch(() => res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .send({ message: SERVER_ERROR_MESSAGE }));
+    .catch(next);
 };
 
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   const { name, link } = req.body;
   const { _id } = req.user;
   Card.create({ name, link, owner: _id })
     .then((card) => res.status(StatusCodes.CREATED).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(StatusCodes.BAD_REQUEST).send({ message: INCORRECT_DATA_MESSAGE });
+        next(new ValidationError());
       } else {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: SERVER_ERROR_MESSAGE });
+        next(err);
       }
     });
 };
 
-const deleteCard = (req, res) => {
+const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
   Card.findById(cardId)
     .orFail(() => {
@@ -48,18 +43,18 @@ const deleteCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(StatusCodes.BAD_REQUEST).send({ message: INCORRECT_CARD_ID_MESSAGE });
+        next(new CastError());
       } else if (err.name === 'ResourceNotFoundError') {
-        res.status(StatusCodes.NOT_FOUND).send({ message: err.message });
+        next(new ResourceNotFoundError());
       } else if (err.name === 'NotOwnerError') {
-        res.status(err.statusCode).send({ message: err.message });
+        next(new NotOwnerError());
       } else {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: SERVER_ERROR_MESSAGE });
+        next(err);
       }
     });
 };
 
-const updateLikeCard = (req, res, operator) => {
+const updateLikeCard = (req, res, operator, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     operator,
@@ -72,21 +67,21 @@ const updateLikeCard = (req, res, operator) => {
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(StatusCodes.BAD_REQUEST).send({ message: INCORRECT_CARD_ID_MESSAGE });
+        next(new CastError());
       } else if (err.name === 'ResourceNotFoundError') {
-        res.status(StatusCodes.NOT_FOUND).send({ message: err.message });
+        next(new ResourceNotFoundError());
       } else {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: SERVER_ERROR_MESSAGE });
+        next(err);
       }
     });
 };
 
-const setLike = (req, res) => {
-  updateLikeCard(req, res, { $addToSet: { likes: req.user._id } });
+const setLike = (req, res, next) => {
+  updateLikeCard(req, res, { $addToSet: { likes: req.user._id } }, next);
 };
 
-const removeLike = (req, res) => {
-  updateLikeCard(req, res, { $pull: { likes: req.user._id } });
+const removeLike = (req, res, next) => {
+  updateLikeCard(req, res, { $pull: { likes: req.user._id } }, next);
 };
 
 module.exports = {
