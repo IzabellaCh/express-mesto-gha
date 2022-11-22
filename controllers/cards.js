@@ -1,6 +1,6 @@
 const { StatusCodes } = require('http-status-codes');
 const Card = require('../models/card');
-const ResourceNotFoundError = require('../errors/error');
+const ResourceNotFoundError = require('../errors/resourceNotFoundError');
 const NotOwnerError = require('../errors/notOwnerError');
 const {
   SERVER_ERROR_MESSAGE,

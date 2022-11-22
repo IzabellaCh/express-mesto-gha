@@ -2,23 +2,20 @@ const { StatusCodes } = require('http-status-codes');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const ResourceNotFoundError = require('../errors/error');
-const {
-  SERVER_ERROR_MESSAGE,
-  INCORRECT_USER_ID_MESSAGE,
-  INCORRECT_DATA_MESSAGE,
-} = require('../constants');
+const ResourceNotFoundError = require('../errors/resourceNotFoundError');
+const CastError = require('../errors/castError');
+const EmailIsRegistered = require('../errors/emailIsRegistered');
+const ValidationError = require('../errors/validationError');
+const WrongEmailOrPasswordError = require('../errors/wrongEmailOrPasswordError');
 
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
-    .catch(() => res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .send({ message: SERVER_ERROR_MESSAGE }));
+    .catch(next);
 };
 
 // общая функция, используется в 2х контроллерах: getUserById, getMyProfile
-const findUserById = (req, res, id) => {
+const findUserById = (req, res, id, next) => {
   User.findById(id)
     .orFail(() => {
       throw new ResourceNotFoundError();
@@ -26,24 +23,24 @@ const findUserById = (req, res, id) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(StatusCodes.BAD_REQUEST).send({ message: INCORRECT_USER_ID_MESSAGE });
+        next(new CastError());
       } else if (err.name === 'ResourceNotFoundError') {
-        res.status(StatusCodes.NOT_FOUND).send({ message: err.message });
+        next(new ResourceNotFoundError());
       } else {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: SERVER_ERROR_MESSAGE });
+        next(err);
       }
     });
 };
 
-const getUserById = (req, res) => {
-  findUserById(req, res, req.params.userId);
+const getUserById = (req, res, next) => {
+  findUserById(req, res, req.params.userId, next);
 };
 
-const getMyProfile = (req, res) => {
-  findUserById(req, res, req.user._id);
+const getMyProfile = (req, res, next) => {
+  findUserById(req, res, req.user._id, next);
 };
 
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const {
     name,
     about,
@@ -62,16 +59,16 @@ const createUser = (req, res) => {
     .then((user) => res.status(StatusCodes.CREATED).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(StatusCodes.BAD_REQUEST).send({ message: INCORRECT_DATA_MESSAGE });
-      } else if (err.name === 'ResourceNotFoundError') {
-        res.status(StatusCodes.UNAUTHORIZED).send({ message: INCORRECT_DATA_MESSAGE });
+        next(new ValidationError());
+      } else if (err.name === 'MongoServerError') {
+        next(new EmailIsRegistered());
       } else {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: SERVER_ERROR_MESSAGE });
+        next(err);
       }
     });
 };
 
-const updateProfile = (req, res) => {
+const updateProfile = (req, res, next) => {
   const { name, about } = req.body;
   const id = req.user._id;
   User.findByIdAndUpdate(id, { name, about }, { runValidators: true, new: true })
@@ -81,18 +78,18 @@ const updateProfile = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ResourceNotFoundError') {
-        res.status(StatusCodes.NOT_FOUND).send({ message: err.message });
+        next(new ResourceNotFoundError());
       } else if (err.name === 'CastError') {
-        res.status(StatusCodes.BAD_REQUEST).send({ message: INCORRECT_USER_ID_MESSAGE });
+        next(new CastError());
       } else if (err.name === 'ValidationError') {
-        res.status(StatusCodes.BAD_REQUEST).send({ message: INCORRECT_DATA_MESSAGE });
+        next(new ValidationError());
       } else {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: SERVER_ERROR_MESSAGE });
+        next(err);
       }
     });
 };
 
-const updateAvatar = (req, res) => {
+const updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
   const id = req.user._id;
   User.findByIdAndUpdate(id, { avatar }, { runValidators: true, new: true })
@@ -102,18 +99,18 @@ const updateAvatar = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ResourceNotFoundError') {
-        res.status(StatusCodes.NOT_FOUND).send({ message: err.message });
+        next(new ResourceNotFoundError());
       } else if (err.name === 'CastError') {
-        res.status(StatusCodes.BAD_REQUEST).send({ message: INCORRECT_USER_ID_MESSAGE });
+        next(new CastError());
       } else if (err.name === 'ValidationError') {
-        res.status(StatusCodes.BAD_REQUEST).send({ message: INCORRECT_DATA_MESSAGE });
+        next(new ValidationError());
       } else {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: SERVER_ERROR_MESSAGE });
+        next(err);
       }
     });
 };
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
@@ -127,10 +124,10 @@ const login = (req, res) => {
         .end();
     })
     .catch((err) => {
-      if (err.name === 'ResourceNotFoundError') {
-        res.status(StatusCodes.UNAUTHORIZED).send({ message: 'Неправильные почта или пароль' });
+      if (err.name === 'WrongEmailOrPasswordError') {
+        next(new WrongEmailOrPasswordError());
       } else {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: SERVER_ERROR_MESSAGE });
+        next(err);
       }
     });
 };
