@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const ResourceNotFoundError = require('../errors/resourceNotFoundError');
 const CastError = require('../errors/castError');
-const EmailIsRegistered = require('../errors/emailIsRegistered');
+const EmailIsRegisteredError = require('../errors/emailIsRegisteredError');
 const ValidationError = require('../errors/validationError');
 const WrongEmailOrPasswordError = require('../errors/wrongEmailOrPasswordError');
 
@@ -61,7 +61,7 @@ const createUser = (req, res, next) => {
       if (err.name === 'ValidationError') {
         next(new ValidationError());
       } else if (err.name === 'MongoServerError') {
-        next(new EmailIsRegistered());
+        next(new EmailIsRegisteredError());
       } else {
         next(err);
       }
