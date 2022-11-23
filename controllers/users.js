@@ -56,7 +56,9 @@ const createUser = (req, res, next) => {
       email,
       password: hash,
     }))
-    .then((user) => res.status(StatusCodes.CREATED).send(user))
+    .then((user) => res
+      .status(StatusCodes.CREATED)
+      .send(user.toJSON()))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new ValidationError());
@@ -77,6 +79,7 @@ const updateProfile = (req, res, next) => {
     })
     .then((user) => res.send(user))
     .catch((err) => {
+      console.log(err);
       if (err.name === 'ResourceNotFoundError') {
         next(new ResourceNotFoundError());
       } else if (err.name === 'CastError') {
