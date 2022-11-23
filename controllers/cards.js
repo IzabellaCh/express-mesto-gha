@@ -2,8 +2,6 @@ const { StatusCodes } = require('http-status-codes');
 const Card = require('../models/card');
 const ResourceNotFoundError = require('../errors/resourceNotFoundError');
 const NotOwnerError = require('../errors/notOwnerError');
-// const CastError = require('../errors/castError');
-// const ValidationError = require('../errors/validationError');
 const BadRequestError = require('../errors/badRequestError');
 
 const getCards = (req, res, next) => {

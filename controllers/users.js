@@ -3,7 +3,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const ResourceNotFoundError = require('../errors/resourceNotFoundError');
-// const CastError = require('../errors/castError');
 const EmailIsRegisteredError = require('../errors/emailIsRegisteredError');
 const ValidationError = require('../errors/validationError');
 const WrongEmailOrPasswordError = require('../errors/wrongEmailOrPasswordError');
