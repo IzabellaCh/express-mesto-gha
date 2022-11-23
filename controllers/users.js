@@ -7,6 +7,7 @@ const CastError = require('../errors/castError');
 const EmailIsRegisteredError = require('../errors/emailIsRegisteredError');
 const ValidationError = require('../errors/validationError');
 const WrongEmailOrPasswordError = require('../errors/wrongEmailOrPasswordError');
+const BadRequestError = require('../errors/badRequestError');
 
 const getUsers = (req, res, next) => {
   User.find({})
@@ -23,7 +24,7 @@ const findUserById = (req, res, id, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new CastError());
+        next(new BadRequestError());
       } else if (err.name === 'ResourceNotFoundError') {
         next(new ResourceNotFoundError());
       } else {
