@@ -12,8 +12,8 @@ const {
 card.get('/', getCards);
 card.post('/', celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    link: Joi.string().pattern(/https?:\/\/\S+\.\S+/),
+    name: Joi.string().required().min(2).max(30),
+    link: Joi.string().required().pattern(/https?:\/\/\S+\.\S+/),
   }),
 }), createCard);
 card.delete('/:cardId', deleteCard);
