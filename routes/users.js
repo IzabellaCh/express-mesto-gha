@@ -11,7 +11,11 @@ const {
 
 user.get('/', getUsers);
 user.get('/me', getMyProfile);
-user.get('/:userId', getUserById);
+user.get('/:userId', celebrate({
+  params: Joi.object().keys({
+    userId: Joi.string().alphanum().length(24),
+  }),
+}), getUserById);
 user.patch('/me', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),

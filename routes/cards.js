@@ -16,8 +16,20 @@ card.post('/', celebrate({
     link: Joi.string().required().pattern(/https?:\/\/\S+\.\S+/),
   }),
 }), createCard);
-card.delete('/:cardId', deleteCard);
-card.put('/:cardId/likes', setLike);
-card.delete('/:cardId/likes', removeLike);
+card.delete('/:cardId', celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().alphanum().length(24),
+  }),
+}), deleteCard);
+card.put('/:cardId/likes', celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().alphanum().length(24),
+  }),
+}), setLike);
+card.delete('/:cardId/likes', celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().alphanum().length(24),
+  }),
+}), removeLike);
 
 module.exports = card;
