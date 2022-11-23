@@ -2,7 +2,7 @@ const { StatusCodes } = require('http-status-codes');
 const Card = require('../models/card');
 const ResourceNotFoundError = require('../errors/resourceNotFoundError');
 const NotOwnerError = require('../errors/notOwnerError');
-const CastError = require('../errors/castError');
+// const CastError = require('../errors/castError');
 // const ValidationError = require('../errors/validationError');
 const BadRequestError = require('../errors/badRequestError');
 
@@ -44,7 +44,7 @@ const deleteCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new CastError());
+        next(new BadRequestError());
       } else if (err.name === 'ResourceNotFoundError') {
         next(new ResourceNotFoundError());
       } else if (err.name === 'NotOwnerError') {

@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const ResourceNotFoundError = require('../errors/resourceNotFoundError');
-const CastError = require('../errors/castError');
+// const CastError = require('../errors/castError');
 const EmailIsRegisteredError = require('../errors/emailIsRegisteredError');
 const ValidationError = require('../errors/validationError');
 const WrongEmailOrPasswordError = require('../errors/wrongEmailOrPasswordError');
@@ -83,9 +83,7 @@ const updateProfile = (req, res, next) => {
       console.log(err);
       if (err.name === 'ResourceNotFoundError') {
         next(new ResourceNotFoundError());
-      } else if (err.name === 'CastError') {
-        next(new CastError());
-      } else if (err.name === 'ValidationError') {
+      } else if (err.name === 'CastError' || err.name === 'ValidationError') {
         next(new ValidationError());
       } else {
         next(err);
@@ -104,9 +102,7 @@ const updateAvatar = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ResourceNotFoundError') {
         next(new ResourceNotFoundError());
-      } else if (err.name === 'CastError') {
-        next(new CastError());
-      } else if (err.name === 'ValidationError') {
+      } else if (err.name === 'CastError' || err.name === 'ValidationError') {
         next(new ValidationError());
       } else {
         next(err);
