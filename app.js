@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const { errors } = require('celebrate');
 const router = require('./routes/index');
 const { PORT, mongoDB } = require('./constants');
+const handleError = require('./middlewares/handleError');
 
 const app = express();
 
@@ -16,19 +17,7 @@ mongoose.connect(mongoDB);
 app.use('/', router);
 
 app.use(errors());
-app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
-
-  res
-    .status(statusCode)
-    .send({
-      message: statusCode === 500
-        ? 'На сервере произошла ошибка'
-        : message,
-    });
-
-  next();
-});
+app.use(handleError);
 
 app.listen(PORT, () => {
   console.log('Сервер запущен');
