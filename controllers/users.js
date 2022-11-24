@@ -8,6 +8,8 @@ const ValidationError = require('../errors/validationError');
 const WrongEmailOrPasswordError = require('../errors/wrongEmailOrPasswordError');
 const BadRequestError = require('../errors/badRequestError');
 
+const { JWT_SECRET = 'some-secret-key' } = process.env;
+
 const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
@@ -113,7 +115,7 @@ const login = (req, res, next) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
       res
         .cookie('jwt', token, {
           maxAge: 3600000 * 24 * 7,
