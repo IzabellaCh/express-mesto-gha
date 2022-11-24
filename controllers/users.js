@@ -8,7 +8,7 @@ const ValidationError = require('../errors/validationError');
 const WrongEmailOrPasswordError = require('../errors/wrongEmailOrPasswordError');
 const BadRequestError = require('../errors/badRequestError');
 
-const { JWT_SECRET = 'some-secret-key' } = process.env;
+const { JWT_SECRET } = require('../constants');
 
 const getUsers = (req, res, next) => {
   User.find({})
