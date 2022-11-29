@@ -7,6 +7,7 @@ const { errors } = require('celebrate');
 const router = require('./routes/index');
 const { PORT, mongoDB } = require('./constants');
 const handleError = require('./middlewares/handleError');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const app = express();
 
@@ -26,8 +27,10 @@ app.use(cookieParser());
 
 mongoose.connect(mongoDB);
 
+app.use(requestLogger);
 app.use('/', router);
 
+app.use(errorLogger);
 app.use(errors());
 app.use(handleError);
 
