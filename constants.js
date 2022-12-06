@@ -1,7 +1,7 @@
 const {
   PORT = 3000,
   mongoDB = 'mongodb://localhost:27017/mestodb',
-  JWT_SECRET = 'some-secret-key',
+  JWT_SECRET_DEV = 'some-secret-key',
 } = process.env;
 
 const SERVER_ERROR_MESSAGE = 'На сервере произошла ошибка';
@@ -18,5 +18,5 @@ module.exports = {
   PAGE_NOT_FOUND_MESSAGE,
   PORT,
   mongoDB,
-  JWT_SECRET,
+  JWT_SECRET_DEV,
 };

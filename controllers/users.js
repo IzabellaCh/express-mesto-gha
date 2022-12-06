@@ -8,7 +8,9 @@ const ValidationError = require('../errors/validationError');
 const WrongEmailOrPasswordError = require('../errors/wrongEmailOrPasswordError');
 const BadRequestError = require('../errors/badRequestError');
 
-const { JWT_SECRET } = require('../constants');
+const { JWT_SECRET_DEV } = require('../constants');
+
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 const getUsers = (req, res, next) => {
   User.find({})
@@ -81,7 +83,6 @@ const updateProfile = (req, res, next) => {
     })
     .then((user) => res.send(user))
     .catch((err) => {
-      console.log(err);
       if (err.name === 'ResourceNotFoundError') {
         next(new ResourceNotFoundError());
       } else if (err.name === 'CastError' || err.name === 'ValidationError') {
@@ -115,11 +116,14 @@ const login = (req, res, next) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
+      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : JWT_SECRET_DEV, { expiresIn: '7d' });
+
       res
         .cookie('jwt', token, {
           maxAge: 3600000 * 24 * 7,
           httpOnly: true,
+          sameSite: false,
+          secure: NODE_ENV === 'production',
         })
         .send({ message: 'Вы успешно авторизовались' })
         .end();

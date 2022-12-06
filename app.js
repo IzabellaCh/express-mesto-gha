@@ -11,6 +11,8 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const app = express();
 
+require('dotenv').config();
+
 // ограничение количества запросов
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
