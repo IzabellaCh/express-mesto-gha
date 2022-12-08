@@ -1,5 +1,5 @@
 const {
-  PORT = 3000,
+  PORT = 3001,
   mongoDB = 'mongodb://localhost:27017/mestodb',
   JWT_SECRET_DEV = 'some-secret-key',
 } = process.env;
